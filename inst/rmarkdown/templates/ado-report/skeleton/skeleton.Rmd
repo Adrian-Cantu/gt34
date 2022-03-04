@@ -1,0 +1,63 @@
+---
+title: "A good tile"
+author: "myself"
+date: "`r format(Sys.time(), '%Y %B %d')`"
+citation-style: Mod_cell.csl
+geometry: margin=2cm
+fancy: true
+output:
+  bookdown::pdf_document2: 
+    template: Adrian-Cantu_template.tex
+    keep_tex: true
+    toc: false
+  bookdown::html_document2: default
+bibliography: 'mios.bib'
+# produce both html and pdf 
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding,output_format = "all") })
+---
+
+```{r setup, message = FALSE, warning = FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
+	fig.pos = 'H'
+)
+library(knitr)
+if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
+  doc_format <- 'live'
+} else {
+  doc_format <-  opts_knit$get("rmarkdown.pandoc.to")
+}
+
+```
+
+<!-- yaml variables can be defined after running some R code  -->
+
+---
+my_subtitle: "This document is format `r doc_format`"
+---
+
+
+
+# Cite some random papar
+
+you can site papers either with square brakets [\@cantuPhANNsFastAccurate2020] ->  [@cantuPhANNsFastAccurate2020] \
+or without \@connorNCBIVirusDiscovery2019 -> @connorNCBIVirusDiscovery2019
+
+# loren ipsum
+
+<p>Lorem ipsum dolor sit amet. Qui aliquid deserunt nam dolor aspernatur et voluptatem blanditiis non ipsam doloribus non eaque iusto. Est nostrum consequatur est possimus excepturi nam dolorem illo. Aut aspernatur aspernatur eum quia deleniti in natus molestiae hic internos pariatur. Qui exercitationem neque et sunt esse est fugit voluptatem At accusamus aspernatur quo voluptatem omnis ut quis amet. </p><p>Eos sapiente dolores aut sapiente dicta qui tenetur quasi ut atque autem. Qui mollitia minima est labore alias qui doloribus quisquam et dolorem quas. </p><p>In sapiente voluptatem sit nihil praesentium est corrupti quasi id autem earum vel delectus voluptatem. Ut voluptatem ipsum a incidunt illum sed facere corrupti? Eum voluptates quos sed tenetur accusamus est saepe consequatur id velit voluptate. Et voluptatem similique est voluptatem ratione sed cupiditate perferendis. </p><p>Qui eaque quisquam quo internos galisum ut itaque deserunt est exercitationem excepturi et consectetur unde aut officia adipisci. Est nesciunt molestias  rerum aperiam et suscipit voluptas. </p><p>Hic consequatur similique sit mollitia aliquam non assumenda nobis et cumque nostrum? Et facilis rerum ut magni earum non voluptatem dolores ut perferendis fugit sed repellendus fugit. Id autem saepe aut excepturi voluptas et fuga beatae quo consequatur alias quo doloribus dolor. Eos sint quia hic repellendus quia hic voluptatibus harum et tempore deserunt. </p><p>Est sapiente velit in quia animi et commodi praesentium et magnam fuga cum distinctio nihil qui possimus aspernatur? Et iste nulla vel vero voluptates At ullam porro qui nihil iusto est facere voluptas! Ut reiciendis perferendis et officia consequatur sit provident labore est accusamus velit qui mollitia dolores. </p><p>Ut provident iure aut dolore rerum quo voluptatem dignissimos et explicabo perferendis est numquam veniam et fugiat vero At rerum autem. In veniam perferendis 33 saepe perspiciatis et aliquid temporibus ad labore repellat ut  iure vel voluptas asperiores? </p><p>Ut quos quae qui quis quas qui optio quaerat qui asperiores aliquid in magnam vitae qui impedit enim nam quia natus? Et molestiae recusandae ea galisum voluptatem a dolorem sapiente non officiis doloremque. Ab dolore perspiciatis in error maxime qui dolor dolorem qui quam modi est nihil eligendi et quod illo et neque quas. Aut maiores veritatis aut porro dolor rem rerum officia! </p><p>Aut sint esse quo maiores galisum quo vero ipsum et quidem expedita aut  animi. Aut maiores galisum qui fugiat harum ut voluptas quas At excepturi veritatis aut rerum veritatis  consequatur obcaecati. Sit maxime ratione qui iste temporibus qui tenetur sunt aut expedita laudantium est architecto Quis ut voluptatem dolores. Et saepe velit est mollitia nihil et alias unde est  dolor eos asperiores nihil qui voluptatem beatae est pariatur veniam. </p><p>Ex ullam maxime eos accusantium quidem vel vero quis et autem odit. Ut nobis quia qui voluptatem perferendis aut minus galisum! Ea totam voluptas id nulla quos et quia delectus a perferendis galisum sit sequi labore. Qui cupiditate fugiat id pariatur voluptatum aut maxime doloribus nam nihil voluptate. </p><p>Aut reiciendis odio et aliquid quis sit cumque voluptatem a ipsum tempore in dolorum quasi et velit dicta. 33 harum magnam et facere repudiandae ut illum soluta aut enim recusandae est nostrum quod. At neque voluptas ea soluta blanditiis nam repudiandae recusandae. </p><p>Sed aliquid nihil sit nulla quibusdam ut odio voluptatem eos consequatur enim qui culpa blanditiis id voluptatem porro. Est magnam reprehenderit eum voluptate molestias non animi tempore et repellendus consequatur ea nihil adipisci qui nemo placeat qui dolore architecto. Vel adipisci Quis non cumque omnis non voluptatem nulla est cumque sunt aut Quis voluptatem vel architecto perspiciatis sit consequuntur officiis. Vel neque quidem sit voluptate recusandae cum recusandae debitis 33 voluptas tenetur aut magni maiores. </p><p>Est nulla iure sed eaque atque sit laborum assumenda At nobis sint ut magnam magni a nisi temporibus est repudiandae sunt. Est eveniet voluptatem ut soluta sint ut deleniti autem et libero recusandae. Qui vero  aut maiores voluptates et dicta temporibus sed placeat possimus aut vitae aliquid ea internos quibusdam aut galisum eligendi! Qui similique perspiciatis ut voluptatibus ducimus qui dicta quasi. </p><p>Eum voluptatibus beatae in cumque corrupti et quis explicabo et commodi reiciendis 33 nostrum perferendis At amet corrupti est ratione quis! Ad impedit ipsa eos magnam error est explicabo ducimus aut sint tempore non vitae quos. Est veritatis suscipit sed Quis repellendus sed nihil molestiae est galisum repudiandae qui itaque consectetur cum dolore ipsa. </p><p>Ea omnis obcaecati et minima nisi aut molestiae dolorem. Eos deleniti repellat sed debitis unde et quibusdam molestiae. </p><p>Aut sint dolore  praesentium debitis aut nihil laudantium. Qui eveniet voluptatem et fuga sequi ea officia odio sed voluptatem voluptate 33 molestias dicta! </p><p>A magnam possimus ut magnam maxime est alias dolorem aut nemo exercitationem ut voluptas explicabo. Et similique fugiat est veritatis voluptate qui voluptatibus neque. Qui aspernatur maiores est accusantium earum non esse facilis. </p><p>Id autem quia ex mollitia autem et vero nostrum vel autem quia et excepturi temporibus qui illum omnis est alias consequuntur. Quo exercitationem laboriosam in fugit minus et quam sunt aut molestias inventore ad nobis architecto et pariatur voluptas ut dolorem dolores. Id sunt quod 33 quis saepe et impedit enim eum quia galisum et odit omnis vel nisi adipisci. Ut accusamus aliquid et repudiandae necessitatibus vel adipisci odit et quas possimus ea molestiae enim quo facere earum cum officia dolor. </p>
+
+
+
+<!-- references can be placed in a specic poin of the documen -->
+# References
+
+<div id="refs"></div>
+
+# Some apendix after the references
+
+repellendus ipsum aut consectetur expedita
+

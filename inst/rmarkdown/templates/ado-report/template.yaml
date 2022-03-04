@@ -1,0 +1,4 @@
+name: My Template ado
+description: >
+  A reprex template that demonstrates many features
+create_dir: true
