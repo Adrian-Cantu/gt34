@@ -29,24 +29,14 @@ possible split positions.
 
 For \code{str_split_fixed}, if n is greater than the number of pieces,
 the result will be padded with empty strings.}
-
-\item{x}{A character vector with one element.}
-
-\item{split}{What to split on.}
 }
 \value{
-A character vector.
-
 A character vector.
 }
 \description{
 Split a string
 }
 \examples{
-x <- "alfa,bravo,charlie,delta"
-strsplit1(x, split = ",")
-Split a string
-
 x <- "alfa,bravo,charlie,delta"
 str_split_one(x, pattern = ",")
 str_split_one(x, pattern = ",", n = 2)
