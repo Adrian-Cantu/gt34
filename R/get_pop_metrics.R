@@ -38,6 +38,7 @@ get_pop_metrics <- function(dd) {
       "UC50" = calculateUC50(.data$estAbund),
       .groups = 'drop'
     )
+  return(pop_stats)
 }
 
 
@@ -67,4 +68,5 @@ get_pop_metrics_gtsp <- function(dd, round=3) {
       "UC50" = calculateUC50(.data$estAbund),
       .groups = 'drop'
     )
+  return(pop_stats)
 }
