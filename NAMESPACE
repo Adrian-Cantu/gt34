@@ -2,6 +2,9 @@
 
 export(get_pop_metrics)
 export(get_pop_metrics_gtsp)
+export(ppf_table)
+export(print_table)
+export(print_table_long)
 export(str_split_one)
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
