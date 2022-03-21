@@ -69,7 +69,7 @@ print_table_long <- function(table,doc_format='live',font_size=7,
 #' @export
 ppf_table <- function(table){
   table_insites <- table %>%
-#    mutate(cellType=cellTypeControlVoc2(cellType)) %>%
+    dplyr::mutate(cellType=cellTypeControlVoc2(.data$cellType)) %>%
     get_pop_metrics_gtsp() %>%
     dplyr::arrange(.data$patient,.data$timePointDays,.data$cellType)
 
