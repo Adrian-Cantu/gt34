@@ -1,0 +1,369 @@
+---
+title: "CHOP959 Trial Report"
+author: "Adrian Cantu"
+date: "`r format(Sys.time(), '%Y %B %d')`"
+header-includes:
+   - \usepackage{graphicx}
+citation-style: Mod_cell.csl
+geometry: margin=2cm
+fancy: true
+output:
+  bookdown::pdf_document2: 
+    template: Adrian-Cantu_template.tex
+    keep_tex: false
+    toc: false
+#  bookdown::html_document2: default
+bibliography: 'mios.bib'
+# produce both html and pdf 
+#knit: (function(inputFile, encoding) {
+#  rmarkdown::render(inputFile, encoding = encoding,output_format = "all") })
+---
+
+```{r setup, message = FALSE, warning = FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	echo = FALSE,
+	fig.pos = 'H'
+)
+library(knitr)
+#library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(RMySQL)
+#library(hiAnnotator)
+library(RColorBrewer)
+library(kableExtra)
+library(vegan)
+library(grid)
+library(egg)
+library(gt34)
+#library(reldist)
+if (is.null(opts_knit$get("rmarkdown.pandoc.to"))) {
+  doc_format <- 'live'
+} else {
+  doc_format <-  opts_knit$get("rmarkdown.pandoc.to")
+}
+
+```
+
+<!-- yaml variables can be defined after running some R code  -->
+
+---
+my_subtitle: "Insertion Site Analysis"
+---
+
+```{r}
+dbConn  <- dbConnect(MySQL(), group='specimen_management')
+samples <- dbGetQuery(dbConn,'select * from gtsp where Trial="Gill_CART19_18415"')
+
+
+intSites <- readRDS(rmarkdown::metadata$rds_file)
+
+dd <- intSites %>% as.data.frame()
+
+```
+
+
+# Samples
+
+The samples studied in this report, the numbers of sequence reads, recovered integrated vectors, and unique integration
+sites available are shown in the table below. We quantify population clone diversity using Gini coefficients, Shannon index, Simpson index,and UC50. The Gini coefficient provides a measure of inequality in clonal abundance in each sample. The coefficient equals zero when all sites are equally abundant (polyclonal) and increases as fewer sites account for more of the total (oligoclonal). The Shannon index is another widely used measure of diversity; it accounts for both abundance and evenness of the integration events. The Simpson index is the probability that two cells chosen at random have the same insertion site.
+The UC50 is the number of unique clones which make up the top 50% of the sample's abundance. For polyclonal samples,
+one may expect a low Gini coefficient, low Simpson Index, high Shannon Index, and high UC50.
+
+Under most circumstances only a subset of sites present in the specimen will be sampled. We thus include an estimate of integration site population size based on frequency of isolation information from the SonicLength method [@berry2012]. The 'S.chao1' column denotes the estimated lower bound for population size derived using the Chao estimate [@chao1987].
+
+We estimate the numbers of cell clones sampled using the SonicLength method [@berry2012]; this is summarized in the column “Unique”. Integration sites were recovered using ligation mediated PCR after random fragmentation of genomic DNA, which reduces recovery biases compared with restriction enzyme cleavage. Relative abundance was not measured from read counts, which are known to be inaccurate, but from marks introduced into DNA specimens prior to PCR amplification using the SonicLength method [@berry2012].
+
+
+```{r}
+ppf_table(dd)
+```
+
+```{r}
+filter_insites <- dd %>%
+  mutate(cellType=cellTypeControlVoc(cellType)) %>%
+  get_pop_metrics() #%>%
+  #filter(numClones >= 100)
+```
+
+\newpage
+# Shannon
+
+```{r}
+blood_insites <-  filter_insites %>% 
+    filter(cellType %in% c('Blood','Tcell')) %>%
+    group_by(patient) %>% 
+    mutate(nn=n()) %>% 
+    ungroup() %>% 
+    filter(nn>1)
+blood_fig_size <- floor(length(unique(blood_insites$patient))/6)
+blood_x_limit <- max(log2(blood_insites$timePointDays))
+
+shannon_figs <- lapply(0:blood_fig_size,function(x){
+ blood_insites %>% 
+    mutate(pmod=floor((as.numeric(as.factor(patient))-1) /6)) %>% 
+    filter(pmod==x) %>% 
+  #filter(!(patient %in% c('CHOP959-160','CHOP959-107','CHOP959-158'))) %>% 
+    ggplot(aes(log2(timePointDays+1), Shannon)) +
+    theme_bw()+
+  #scale_color_manual(name = 'Patient', values = colors) +
+    geom_point(size = 1) +
+    geom_line() +
+  scale_y_continuous(breaks=seq(0, 10, by = 1), limits=c(0,10))+
+  scale_x_continuous(limits=c(0,blood_x_limit)) +
+    labs(x = 'Time point (log2)', y = 'Shannon index') +
+    theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black")) +
+    facet_wrap(~patient,ncol=3)
+  })
+
+for (x in 0:blood_fig_size) {
+  plot(shannon_figs[[x+1]])
+}
+
+```
+\newpage
+
+# Gini
+
+```{r}
+blood_insites <-  filter_insites %>% 
+    filter(cellType %in% c('Blood','Tcell')) %>%
+    group_by(patient) %>% 
+    mutate(nn=n()) %>% 
+    ungroup() %>% 
+    filter(nn>1)
+blood_fig_size <- floor(length(unique(blood_insites$patient))/6)
+blood_x_limit <- max(log2(blood_insites$timePointDays))
+
+shannon_figs <- lapply(0:blood_fig_size,function(x){
+ blood_insites %>% 
+    mutate(pmod=floor((as.numeric(as.factor(patient))-1) /6)) %>% 
+    filter(pmod==x) %>% 
+  #filter(!(patient %in% c('CHOP959-160','CHOP959-107','CHOP959-158'))) %>% 
+    ggplot(aes(log2(timePointDays+1), Gini)) +
+    theme_bw()+
+  #scale_color_manual(name = 'Patient', values = colors) +
+    geom_point(size = 1) +
+    geom_line() +
+  scale_y_continuous(breaks=seq(0, 1, by = 0.1), limits=c(0,1))+
+  scale_x_continuous(limits=c(0,blood_x_limit)) +
+    labs(x = 'Time point (log2)', y = 'Gini index') +
+    theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black")) +
+    facet_wrap(~patient,ncol=3)
+  })
+
+for (x in 0:blood_fig_size) {
+  plot(shannon_figs[[x+1]])
+}
+
+```
+
+
+```{r}
+kk <- dd %>%
+  mutate(cellType=cellTypeControlVoc2(cellType)) %>% 
+  filter(cellType %in% c('Blood','Tcell')) %>%
+  group_by(GTSP) %>% 
+  mutate(numClones=n()) %>% 
+#  filter(numClones >= 100) %>% 
+  ungroup() %>% 
+  mutate(labeledNearestFeature = paste0(nearestFeature, ' ')) %>%
+  mutate(labeledNearestFeature =
+           ifelse(inFeature,paste0(labeledNearestFeature, '*'), labeledNearestFeature)) %>%
+  mutate(labeledNearestFeature = 
+           ifelse(abs(nearestOncoFeatureDist) <= 50000,
+           paste0(labeledNearestFeature, '~'), labeledNearestFeature)) %>%
+  mutate(labeledNearestFeature =
+           ifelse(abs(nearestlymphomaFeatureDist) <= 50000,
+           paste0(labeledNearestFeature, '!'), labeledNearestFeature)) %>%
+  mutate(posidLabel =paste0(stringr::str_replace(labeledNearestFeature,',','\n'), '\n', posid)) %>%
+  mutate(onco=ifelse(abs(nearestOncoFeatureDist) <= 50000,'Near cancer Gene','Not near cancer gene')) %>%
+  mutate(onco=factor(onco,levels = c('Near cancer Gene','Not near cancer gene')))
+
+tt_lvl <- kk %>% group_by(timePoint,timePointDays) %>% 
+  summarise(.groups = 'drop') %>% 
+  arrange(timePointDays) %>% 
+  pull(var = timePoint)
+
+kk2 <- kk %>% 
+  mutate(timePoint=factor(timePoint,tt_lvl)) %>% 
+  group_split(patient)
+```
+
+```{r}
+ggg <- kk2 %>% 
+  lapply(function(xx){
+    top_clones_list <- xx %>%
+      group_by(posid) %>%
+      summarise(sum_ra=sum(relAbund)) %>% 
+      slice_max(sum_ra, n = 10, with_ties=FALSE) %>%
+      pull(var=posid)
+    
+    pat <- unique(xx$patient)[1]
+    
+    gg <- xx %>% 
+      mutate(is_top_ra= posid %in% top_clones_list) %>%
+      mutate(legend_label=ifelse(is_top_ra,posidLabel,'LowAbund')) %>%
+      group_by(timePoint) %>% 
+      mutate(sum_sites=sum(estAbund)) %>%
+      mutate(relAbund=estAbund/sum_sites) %>% 
+      ungroup() %>% 
+      group_by(legend_label,timePoint,sum_sites) %>%
+      summarise(sum_ra=sum(relAbund),.groups='drop') %>%
+      mutate(legend_label=forcats::fct_relevel(as.factor(legend_label),'LowAbund'))
+    
+    gg$grob<- lapply(gg$sum_sites,function(x){
+      textGrob(x,rot=90, hjust = 1, gp=gpar(col="black",fontsize=8,fontface='bold'))})
+    
+    cloneColorsVector_ra <-setNames(c('#eeeeee',colorRampPalette(brewer.pal(12, "Paired"))(length(levels(gg$legend_label))-1)),  levels(gg$legend_label))
+    
+    gg2 <- gg %>% 
+      ggplot(aes(x=timePoint, y=sum_ra, fill=legend_label)) +
+      geom_bar(stat='identity', color = 'black', size = 0.20) +
+      theme_classic() +
+      ggtitle(paste0("--",pat,"--")) +
+      scale_x_discrete(drop=FALSE) +
+      scale_fill_manual(name = 'Clones', values = cloneColorsVector_ra) +
+      scale_y_continuous(labels = scales::percent) +
+      labs(x = 'Time Point', y = 'Relative Sonic Abundance') +
+      theme(axis.text.x = element_text(angle = 315, hjust = 0)) +
+      guides(fill=guide_legend(title.position = "top", ncol=2, keyheight=0.3, keywidth=0.2, default.unit="inch")) +
+  #facet_grid(cols=vars(bar_data_ra$SpecimenInfo),scales = "free_x", space = "free_x",switch='x') + 
+      geom_custom( aes(data = grob,y=0.98), grob_fun = identity)
+    
+    return(gg2)
+    
+  })
+```
+
+\newpage
+# barplots
+
+Integration positions are reported in the following format "nearest gene, chromosome, +/-, genomic position" where the nearest gene is the nearest
+transcriptional boundary to the integration position, '+' refers to integration in the positive orientation and '-' refers to integration in
+the reverse orientation. Reported distances are signed where the sign indicates if integrations are upstream (-) or downstream (+, no sign)
+of the nearest gene. Nearest genes possess additional annotations described in the table below.
+
+The following barplots show the prevalence the 10 most abundant clones for each patient. The numbers over each bar are the number of clones (as determined by Sonic Abundance) for that sample. 
+
+```{r, echo=FALSE, results='asis'}
+library(xtable)
+o <- data.frame(Symbol = c('*', '~', '!'),
+                Meaning=c('site is within a transcription unit',
+                          'site is within 50kb of a cancer related gene',
+                          'nearest gene was associated with lymphoma in humans'))
+if(doc_format == 'docx') {
+  regulartable(o) %>% 
+  autofit() %>%
+  fit_to_width(5)
+} else if (doc_format == 'latex') {
+print(xtable(o, align='lll'), comment=FALSE, include.rownames = FALSE)
+} else {
+  o
+}
+```
+
+```{r,fig.width=7,fig.height=9,results='asis'}
+# for (x in 1:length(ggg)) {
+#   plot(ggg[[x]])
+# }
+#ggg[1:3]
+multi.page <- ggpubr::ggarrange(plotlist = ggg,ncol = 1,nrow = 3,align='v',widths=c(1,1))
+for (x in 1:length(multi.page)) {
+  plot(multi.page[[x]])
+  cat('\\newpage')
+}
+```
+
+\newpage
+# barplots - Cancer genes
+
+```{r}
+gggg <- kk2 %>% 
+  lapply(function(xx){
+    gg <- xx %>% 
+      group_by(timePoint) %>% 
+      mutate(sum_sites=sum(estAbund)) %>%
+      mutate(relAbund=estAbund/sum_sites) %>% 
+      ungroup() %>% 
+      group_by(onco,timePoint,sum_sites) %>%
+      summarise(sum_ra=sum(relAbund),.groups='drop') 
+    
+    gg$grob<- lapply(gg$sum_sites,function(x){
+      textGrob(x,rot=90, hjust = 1, gp=gpar(col="black",fontsize=8,fontface='bold'))})
+    
+    onco_col <- setNames(c('#b7f3a5','#c5a5f3'),c('Near cancer Gene','Not near cancer gene'))
+    
+    pat <- unique(xx$patient)[1]
+    
+    gg2 <- gg %>% 
+      ggplot(aes(x=timePoint, y=sum_ra, fill=onco)) +
+      geom_bar(stat='identity', color = 'black', size = 0.20) +
+      theme_classic() +
+      ggtitle(paste0("--",pat,"--")) +
+      scale_x_discrete(drop=FALSE) +
+      scale_fill_manual(name = 'Clones', values = onco_col) +
+      scale_y_continuous(labels = scales::percent) +
+      labs(x = 'Time Point', y = '') +
+      theme(axis.text.x = element_text(angle = 315, hjust = 0)) +
+      guides(fill=guide_legend(title.position = "top", ncol=1, keyheight=0.3, keywidth=0.2, default.unit="inch")) +
+  #facet_grid(cols=vars(bar_data_ra$SpecimenInfo),scales = "free_x", space = "free_x",switch='x') + 
+      geom_custom( aes(data = grob,y=0.98), grob_fun = identity)
+    
+    return(gg2)
+    
+  })
+```
+
+
+```{r,fig.width=7,fig.height=9,results='asis'}
+multi.page <- ggpubr::ggarrange(plotlist = gggg,ncol = 1,nrow = 3,align='v',widths=c(1,1))
+for (x in 1:length(multi.page)) {
+  plot(multi.page[[x]])
+  cat('\\newpage')
+}
+```
+
+## Abundant clones
+
+Looking at samples with at least 50 clones, a few of them have clones with more than 20\% abundance.
+
+```{r}
+kk %>%
+  group_by(GTSP) %>% 
+  dplyr::mutate(TotalClones=sum(estAbund)) %>% 
+  dplyr::ungroup() %>% 
+  filter(relAbund>20) %>%
+  arrange(patient,timePointDays) %>%
+  filter(estAbund>=10) %>% 
+  select(c(patient,cellType,timePoint,posid,TotalClones,estAbund,relAbund,labeledNearestFeature)) %>% 
+  dplyr::rename("Position"=posid) %>%
+  dplyr::rename("SonicAbundance"=estAbund) %>%
+  dplyr::mutate("Abundance"=paste(round(relAbund,digits = 2),'%')) %>% 
+  dplyr::rename("Nearest Feature"=labeledNearestFeature) %>% 
+  dplyr::mutate(relAbund=NULL) %>% 
+  kbl("latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("HOLD_position","scale_down","striped"))
+
+
+#saveRDS(intsites_class,file=file.path(.data_d,'intSites_plus.rds'))
+```
+ 
+
+<!-- references can be placed in a specic poin of the documen -->
+# References
+
+<div id="refs"></div>
+
+<!-- # Some apendix after the references -->
+
+<!-- repellendus ipsum aut consectetur expedita -->
+
