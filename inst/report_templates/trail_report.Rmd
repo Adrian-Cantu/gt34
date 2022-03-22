@@ -12,11 +12,7 @@ output:
     template: Adrian-Cantu_template.tex
     keep_tex: false
     toc: false
-#  bookdown::html_document2: default
 bibliography: 'mios.bib'
-# produce both html and pdf 
-#knit: (function(inputFile, encoding) {
-#  rmarkdown::render(inputFile, encoding = encoding,output_format = "all") })
 ---
 
 ```{r setup, message = FALSE, warning = FALSE, echo=FALSE}
@@ -54,14 +50,8 @@ my_subtitle: "Insertion Site Analysis"
 ---
 
 ```{r}
-dbConn  <- dbConnect(MySQL(), group='specimen_management')
-samples <- dbGetQuery(dbConn,'select * from gtsp where Trial="Gill_CART19_18415"')
-
-
 intSites <- readRDS(rmarkdown::metadata$rds_file)
-
 dd <- intSites %>% as.data.frame()
-
 ```
 
 
